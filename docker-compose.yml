@@ -1,0 +1,31 @@
+# sudo docker compose up --build
+
+services:
+  project_bling:
+    build: .
+    container_name: project_bling_container
+    env_file:
+      - .env  # Usando o arquivo .env para as variáveis de ambiente
+    volumes:
+      - ./src:/app/src  # Volume para persistir os repositórios clonados
+      - ~/.ssh:/root/.ssh  # Mapeando chaves SSH para persistência
+    ports:
+      - "5000:5000"  # Porta exposta para o serviço interno da aplicação
+    command: /app/entrypoint.sh
+    depends_on:
+      - db  # Garantir que o PostgreSQL seja iniciado antes da aplicação
+    restart: on-failure
+
+  db:
+    image: postgres:13
+    container_name: postgres_container
+    env_file:
+      - .env  # Usando o arquivo .env para as variáveis do PostgreSQL
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Volume para persistir os dados do PostgreSQL
+    ports:
+      - "5432:5432"  # Expondo a porta do PostgreSQL
+
+volumes:
+  postgres-data:
+
